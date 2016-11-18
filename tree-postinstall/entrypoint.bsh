@@ -1,0 +1,19 @@
+#!/bin/bash
+
+_term() { 
+  echo "Caught SIGTERM signal!" 
+  kill -TERM "$child" 2>/dev/null
+}
+
+trap _term SIGTERM
+
+p2 -t /etc/powerdns/pdns.conf.p2 -o /etc/powerdns/pdns.conf
+
+/usr/sbin/pdns_server \
+    --guardian=no \
+    --daemon=no \
+    --disable-syslog \
+    --write-pid=no &
+    
+child=$!
+wait "$child"
